@@ -1106,7 +1106,7 @@ Các package trong repository có định dạng lưu trữ. Ví dụ, Debian s�
 
 ### Khái niệm Repository
 
-Repository là các kho lưu trữ tập chung chứa các phần mềm / package cần thiết và phổ biến cho các distro Linux khác nhau , mỗi distro có 1 repository riêng
+Repository là Nơi chứa và quản lý package ,được sử dụng để tải về và cài đặt phần mềm tự động. Mỗi distro Linux có một repository chính thức riêng, tuy nhiên có thể thêm các repository ngoài
 
 ## Tổng quan về package management
 
