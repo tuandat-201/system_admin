@@ -1085,7 +1085,8 @@ Các tín hiệu được sử dụng phổ biến nhất là :
 | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
 | yêu cầu tiến trình dừng hoạt động                                            | chấm dứt hoạt động của tiến trình ngay lập tức                                        |
 | có thể được xử lý hoặc từ chối xử lý quá trình dừng hoạt động bởi tiến trình | tiến trình không có cơ hội ngăn chặn hay từ chối                                      |
-| không dừng hoạt động của tiến trình con                                      | dừng hoạt động cả tiến trình cha và tiến trình con nếu có => Dễ tạo ra zombie process |
+| không dừng hoạt động của tiến trình con                                      | dừng hoạt động cả tiến trình cha và tiến trình con nếu có.                            |
+|                                                                              | Sigkill dễ tạo ra các tiến trình ma (zombie process) vì tiến trình bị ngừng hoạt động sẽ không có cơ hội thông báo cho tiến trình cha hoặc tiến trình con về việc bị ngừng hoạt động
 
 ## Tổng quan về Package
 
