@@ -100,7 +100,7 @@ Repository chứa thông tin về địa chỉ của các package, còn các pac
 
 ## Load average
 
-Load average thể hiện rằng có bao nhiêu task đang chờ và bao nhiêu task đã được CPU xử lý trong thời gian 1p , 5p , 15p.
+Load average thể hiện rằng có bao nhiêu task đang chờ, bao nhiêu task đang được xử lý và bao nhiêu task đã được CPU xử lý trong thời gian 1p , 5p , 15p.
 
 Load average phụ thuộc vào số lượng core mà hệ thống có. Load average nhỏ hơn số lượng core thì có nghĩa là hệ thống đang hoạt động bình thường.
 
@@ -135,8 +135,7 @@ với kill, nó sẽ đợi tiến trình giải phóng bộ nhớ, xử lý ti�
 
 Ví dụ có 8 đoạn dữ liệu được đánh số từ 1 đến 8 và 3 ổ đĩa cứng có dung lượng giống nhau. Đoạn dữ liệu số 1 và số 2 sẽ được ghi vào ổ đĩa 1 và 2 riêng rẽ, đoạn sao lưu của chúng được ghi vào ổ cứng 3. Đoạn số 3 và 4 được ghi vào ổ 1 và 3 với đoạn sao lưu tương ứng ghi vào ổ đĩa 2. Đoạn số 5, 6 ghi vào ổ đĩa 2 và 3, còn đoạn sao lưu được ghi vào ổ đĩa 1 và sau đó tŕnh tự này lặp lại, đoạn số 7,8 được ghi vào ổ 1, 2 và đoạn sao lưu ghi vào ổ 3 như ban đầu
 
-Như vậy, RAID 5 vừa đảm bảo tốc độ có cải thiện, vừa giữ được tính an toàn cao. Dung lượng đĩa
-cứng cuối cùng bằng tổng dung lượng đĩa sử dụng trừ đi một ổ. Tức là nếu dùng 3 ổ 80GB thì dung lượng cuối cùng sẽ là 160GB. Nhờ đó nếu hỏng một ổ cứng bất kỳ thì hệ thống vẫn hoạt động bình thường, tuy nhiên hệ thống sẽ lỗi nếu hỏng từ 2 ổ trở lên 
+Như vậy, RAID 5 vừa đảm bảo tốc độ có cải thiện, vừa giữ được tính an toàn cao. Dung lượng đĩa cứng cuối cùng bằng tổng dung lượng đĩa sử dụng trừ đi một ổ. Tức là nếu dùng 3 ổ 80GB thì dung lượng cuối cùng sẽ là 160GB. Nhờ đó nếu hỏng một ổ cứng bất kỳ thì hệ thống vẫn hoạt động bình thường, tuy nhiên hệ thống sẽ lỗi nếu hỏng từ 2 ổ trở lên 
 
 #### Cơ chế dự phòng của RAID 5
 
