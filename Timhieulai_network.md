@@ -67,7 +67,7 @@ Có thể xảy ra do TTL expried, 1 số trường hợp như sau :
 
 ## Tìm hiểu địa chỉ IP động và tĩnh
 
-- Địa chỉ ip động: là địa chỉ tạm thời được gán cho các thiết bị mạng và liên tục thay đổi theo thời gian
+- Địa chỉ ip động: là địa chỉ tạm thời được gán tự động cho các thiết bị mạng và liên tục thay đổi theo thời gian
 
 - Địa chỉ ip tĩnh : là địa chỉ IP cố định được cấu hình thủ công và không thay đổi theo thời gian
 
