@@ -349,3 +349,261 @@ command_timeout=30 #Thời gian chờ phản hồi từ remote host trước khi
 connect_timeout=30 #Thời gian kết nối được duy trì trong bao lâu sau khi không hoạt động
 ```
 
+### Độ ưu tiên của biến
+
+Độ ưu tiên từ nhỏ nhất -> lớn nhất :
+
+1. Biến được lưu ở thư mục default của roles ( roles_example/default/main.yml)
+2. Group vars :
+   - được lưu trong file inventory
+   - Biến thuộc all.yml lưu trong thư mục group_vars 
+   - Các biến thuộc các file khai báo còn lại nằm trong group_vars 
+     - **Lưu ý**: biến được lưu trong thư mục group_vars thuộc về inventory sẽ có độ ưu tiên thấp hơn biến được lưu trong thư mục group_vars thuộc về playbook
+	```
+	test_playbook.yml
+	test_inventory/
+	  hosts.yml
+	  group_vars/
+	    all.yml
+	    group1.yml
+	group_vars/
+	  all.yml
+	  group1.yml
+	```
+3. Host vars :
+   - được lưu trong file inventory
+   - Các biến thuộc file khai báo nằm trong host_vars.
+     - **Lưu ý**: biến được lưu trong thư mục host_vars thuộc về inventory sẽ có độ ưu tiên thấp hơn biến được lưu trong thư mục host_vars thuộc về playbook
+4. host facts
+5. Biến nằm trong play
+6. Biến được nhập từ input với var_prompt
+7. Biến được thêm bởi module vars_files
+8. Biến thuộc thư mục vars của roles
+9. block vars (chỉ các task thuộc về block)
+10. task vars (chỉ thuộc về task)
+11. Biến được thêm bởi module include_vars
+12. Biến được khai báo bằng module set_facts / registered vars
+13. Role parameter
+14. Include parameter
+15. extra vars (-e "user=my_user")
+
+## Ansible Vault
+
+Vault mã hóa các biến và file để ta có thể bảo vệ dữ liệu nhạy cảm như password hoặc key , thay vì hiển thị dưới dạng plain text trong playbook/roles. 
+
+Ansible Vault có thể thực hiện nhiều chức năng, như :
+- Mã hóa file
+- Giải mã file
+- Xem file mã hóa mà không cần phá vỡ mã hóa
+- Chỉnh sửa file mã hóa
+- Tạo file mã hóa
+- Tạo hoặc reset Key mã hóa
+
+### Tạo file mã hóa mới
+
+Sử dụng lệnh `ansible-vault create` được sử dụng để tạo file mã hóa mới
+
+```
+# ansible-vault create vault.yml
+```
+
+Sau khi nhập lệnh này, nó sẽ hỏi password và sẽ mở text editor để ta có thể thao tác với file được mã hóa. Để check file đã mã hóa, sử dụng lệnh `cat`
+
+```
+# cat vault.yml
+
+Output:
+
+$ANSIBLE_VAULT;1.1;AES256
+61393036316637633061333530393932343739626533306133366334353061326437623234383833
+6636616431303065636132666632393365333532306139310a636163313961376561663766396666
+33636661343166343230663034383462386431356562613764373139626437333032656135383837
+3261623732336564640a386633353132323830363561613561663235366463303665613030373137
+31333762656434373539383461393763316232636162663036306662303934316436
+```
+
+### Mã hóa file đã tồn tại
+
+Sử dụng lệnh `ansible-vault encrypt` để mã hóa file :
+
+```
+ansible-vault encrypt vault.yml
+```
+
+### Xem nội dung ban đầu của file mã hóa
+
+Để xem nội dung ban đầu của file mã hóa, ta có thể sử dụng lệnh `ansible-vault view` :
+
+```
+ansible-vault view vault.yml
+```
+
+### Lưu password vault vào file riêng
+
+Để lưu password vault vào 1 file tách biệt, ta sử dụng `--vault-password-file`. Ví dụ, ta có password của file `vault.yml` là `Pa$$worD`, ta có thể lưu nó trong file `secret-vault.txt`
+
+```
+ansible-vault view vault.yml --vault-password-file secret-vault.txt
+```
+	
+### Chỉnh sửa file mã hóa
+
+Để chỉnh sửa file mã hóa, sử dụng lệnh `ansible-vault edit`
+
+```
+ansible-vault edit vault.yml
+```
+
+### Giải mã hóa file
+
+Để giải mã hóa file ,ta sử dụng lệnh `ansible-vault decrypt` :
+
+```
+ansible-vault decrypt vault.yml
+```
+
+### Đổi mật khẩu của file mã hóa
+
+```
+ansible-vault rekey vault.yml
+```
+
+## Chạy Playbook với file được mã hóa bởi vault
+
+Để có thể sử dụng file đã mã hóa bởi vault trong playbook, ta sẽ thực hiện thông qua ví dụ sau :
+
+Tạo file mã hóa `web-secrets.yml` :
+```
+$ ansible-vault create web-secrets.yml
+
+New Vault password: 
+Confirm New Vault password: 
+```
+
+File `web-secrets.yml` chứa biến `secret1` :
+
+```
+$ ansible-vault view web-secrets.yml
+```
+
+Sau đó tạo playbook `vault-playbook.yml` :
+
+```
+$ cat vault-playbook.yml
+
+---
+- name: Accessing Vaults in Playbooks 
+  hosts: node2
+  vars_files: web-secrets.yml
+  tasks:
+    - name: Show secret1 value
+      debug:
+        msg: "{{ secret1 }}"
+```
+
+Giờ ta sẽ thử chạy playbook :
+
+```
+$ ansible-playbook vault-playbook.yml 
+
+ERROR! Attempting to decrypt but no vault secrets found
+```
+
+Có thể thấy, nó đang báo rằng không nhận được password của vault để giải mã file `web-secrets.yml`
+
+Giờ ta chạy lại playbook với option `--ask-vault-pass` :
+
+```
+$ ansible-playbook --ask-vault-pass vault-playbook.yml 
+
+Vault password: 
+
+PLAY [Accessing Vaults in Playbooks] ******************************************
+
+TASK [Gathering Facts] **********************************
+ok: [node2]
+
+TASK [Show secret1 value] *********************************
+ok: [node2] => {
+    "msg": "webkey"
+}
+
+PLAY RECAP *************************
+node2                      : ok=2    changed=0    unreachable=0    failed=0    skipped=0
+```
+
+Ta có thể thấy, playbook cho phép ta nhập mật khẩu vault và đã chạy thành công. Ngoài ra ta có thể sử dụng `--vault-password-file` nếu ta có lưu vault password ở file ngoài :
+
+```
+$ ansible-playbook --vault-password-file vault-pass.txt vault-playbook.yml
+```
+
+Nếu ta muốn sử dụng nhiều file mã hóa cho playbook, sử dụng option `--vault-id`. Ta tiếp tục thực hiện như sau, đầu tiên tạo thêm 1 file mã hóa tên `db-secrets.yml` :
+
+```
+$ ansible-vault create db-secrets.yml
+
+New Vault password: 
+Confirm New Vault password:
+```
+
+`db-secrets.yml` chứa biến `secret2` :
+
+```
+$ ansible-vault view web-secrets.yml 
+
+Vault password: 
+secret2: "dbkey"
+```
+
+Chỉnh sửa `vault-playbook.yml` để sử dụng `db-secrets.yml`:
+
+```
+---
+- name: Accessing Vaults in Playbooks 
+  hosts: node2
+  vars_files:
+    - web-secrets.yml
+    - db-secrets.yml
+  tasks:
+    - name: Show secret1 value
+      debug:
+        msg: "{{ secret1 }}"
+
+    - name: Show secret2 value
+      debug:
+        msg: "{{ secret2 }}"
+```
+
+Sử dụng `--vault-id` khi chạy playbook để cung cấp password cho từng file mã hóa như sau:
+
+```
+$ ansible-playbook --vault-id web-secrets.yml@prompt --vault-id db-secrets@prompt vault-playbook.yml 
+
+Vault password (web-secrets.yml): 
+Vault password (db-secrets): 
+
+PLAY [Accessing Vaults in Playbooks] *********************************************************************************************
+
+TASK [Gathering Facts] ***********************************************************************************************************
+ok: [node2]
+
+TASK [Show secret1 value] ********************************************************************************************************
+ok: [node2] => {
+    "msg": "webkey"
+}
+
+TASK [Show secret2 value] ********************************************************************************************************
+ok: [node2] => {
+    "msg": "dbkey"
+}
+
+PLAY RECAP ***********************************************************************************************************************
+node2                      : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+```
+
+khi chạy playbook sẽ yêu cầu ta nhập vault password của 2 file : `web-secrets.yml` và `db-secrets.yml`, sau đó nó sẽ chạy thành công. Ngoài ra ta có thể sử dụng file để lưu vault password, ở trường hợp này chạy câu lệnh sau để chạy playbook :
+
+```
+$ ansible-playbook --vault-id /path-to-web-vault-file --vault-id /path-to-db-vault-file vault-playbook.yml
+```
