@@ -12,9 +12,9 @@
   - CRITICAL: service gặp vấn đề nghiêm trọng – return code = 2
   - UNKNOW: không thể xác định trạng thái của service – return code = 3
   
-- Hard và soft state: Khi phát hiện vấn đề xảy ra với host/service, host/service ở trạng thái: 
-  - SOFT State : khi host/service có thể chuyển sang UP/OK state sau khi re-check.
-  - HARD State : host/service không chuyển sang UP/OK state sau khi re-check một số lần và gửi thông báo tới admin.
+- Hard và soft state:
+  - Soft State: Khi phát hiện vấn đề xảy ra với host/service, icinga sẽ kiểm tra lại host/service này một số lần trước khi gửi thông báo tới admin. Điều này đảm bảo rằng không có thông báo không cần thiết nào được gửi về các lỗi tạm thời. Trong thời gian này, host/service ở trong trạng thái SOFT state
+  - Hard State: Đối với Hard State, khi mà đã kiểm tra một số lần mà host/service vẫn ở trong trạng thái non-OK state, host/service sẽ chuyển sang trạng thái HARD state và gửi thông báo tới admin
 
 ### File config của icinga2 
 
@@ -240,7 +240,7 @@ TIG stack là một bộ công cụ phổ biến được sử dụng trong lĩn
 
 - Các số liệu được thu thập và đưa vào InfluxDB
 
-- Từ InfluxDB, dữ liệu sẽ được đẩy đến Grafana và hiển thị theo dạng đồ thị trực quan
+- Grafana sau đó thực hiện truy vấn dữ liệu từ InfluxDB và biểu diễn dữ liệu dưới dạng đồ thị trực quan
 
 ### Triển khai
 
